@@ -15,7 +15,7 @@ y = 2*torch.dot(x,x)
 y.backward()
 print(x)
 print(y)
-print(x.grad)
+print(x.grad)  #４x
 
 # 在默认情况下，PyTorch会累积梯度，我们需要在backwa前清除之前的值
 x.grad.zero_()
@@ -61,3 +61,15 @@ print(a.grad==(d/a))
 
 print(dir(torch))
 print(help(torch.ones))
+
+x1 = torch.tensor([[1.0,2.0,3.0],[2,2,2]])
+y = torch.tensor([1,2])
+
+w1 = torch.tensor([1.0,1,1],requires_grad=True)
+b1 = 0
+print(x1.shape)
+print(w1.shape)
+l = (torch.matmul(x1,w1)-y)**2
+print(l)
+l.sum().backward()
+print(w1.grad)

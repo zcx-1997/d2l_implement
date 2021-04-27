@@ -21,7 +21,7 @@ def load_array(data_arrays,batch_size,is_train=True):
     return data.DataLoader(dataset,batch_size,shuffle=is_train)
 
 batch_size = 10
-data_iter = load_array((features,labels),batch_size)
+data_loader = load_array((features,labels),batch_size)
 
 # 定义模型
 from torch import nn
@@ -37,8 +37,10 @@ optimizer = torch.optim.SGD(net.parameters(),lr=0.03)
 # 训练
 epochs = 3
 for epoch in range(epochs):
-    for x,y in data_iter:
+    for x,y in data_loader:
         l = loss(net(x),y)
+        # print(l.shape)  # torch.Size([]) 使用pytorch中的损失函数，loss会自动对小批量求均值
+        # print(l)
         optimizer.zero_grad()
         l.backward()
         optimizer.step()

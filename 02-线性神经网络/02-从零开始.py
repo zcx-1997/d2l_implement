@@ -79,10 +79,14 @@ loss = squared_loss
 
 for epoch in range(epochs):
     for x,y in data_iter(batch_size,features,labels):
-        # print(x.shape)
-        # print(y.shape)
-        # print(w.shape,b.shape)
+        print(x.shape)
+        print(y.shape)
+        print(w.shape,b.shape)
+        logit = net(x,w,b)
+        print(logit.shape)
         l = loss(net(x,w,b),y)  # b*1
+        # print(l.shape)  # torch.Size([10, 1])
+        # print(l)
         l.sum().backward()  # 保证标量，将小批量的loss值累加后再backward
         sgd([w,b],lr,batch_size)
     with torch.no_grad():
