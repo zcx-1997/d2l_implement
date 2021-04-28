@@ -42,7 +42,7 @@ def init_weights(m):
 
 net.apply(init_weights)
 
-loss = nn.CrossEntropyLoss()
+loss = nn.CrossEntropyLoss()  # 没有进行独热编码
 optimizer = torch.optim.SGD(net.parameters(),lr=0.1)
 
 def accuracy(y_hat, y):  #@save
@@ -70,9 +70,12 @@ def train_epoch_ch3(net, train_loader, loss, optimizer):  #@save
     # 训练损失总和、训练准确度总和、样本数
     metric = d2l.Accumulator(3)
     for x, y in train_loader:
-        # 计算梯度并更新参数
-        y_hat = net(x)  # b
-        l = loss(y_hat, y)  # b
+        y_hat = net(x)
+        l = loss(y_hat, y)
+        # print(x.shape)  # torch.Size([256, 1, 28, 28])
+        # print(y.shape)  # torch.Size([256])
+        # print(y_hat.shape)  # torch.Size([256, 10])
+        # print(l.shape)  # torch.Size([])
         if isinstance(optimizer, torch.optim.Optimizer):
             # 使用PyTorch内置的优化器和损失函数
             optimizer.zero_grad()
@@ -108,5 +111,35 @@ def train_ch3(net, train_loader, test_loader, loss, num_epochs, optimizer):  #@s
     # assert train_acc <= 1 and train_acc > 0.7, train_acc
     # assert test_acc <= 1 and test_acc > 0.7, test_acc
 
-num_epochs = 10
+num_epochs = 1
 train_ch3(net, train_loader, test_loader, loss, num_epochs, optimizer)
+
+# 可视化样本
+def show_images(imgs,num_rows,num_cols,titles=None,scale=1.5):  #@save
+    figsize = (num_cols*scale,num_rows*scale)
+    _,axes = plt.subplots(num_rows,num_cols,figsize=figsize)
+    # _,axes = d2l.plt.subplots(num_rows,num_cols,figsize=figsize)
+    axes = axes.flatten()
+    for i, (ax,img) in enumerate(zip(axes,imgs)):
+        if torch.is_tensor(img):
+            ax.imshow(img.numpy())
+        else:
+            ax.imshow(img)
+        ax.axes.get_xaxis().set_visible(False)
+        ax.axes.get_yaxis().set_visible(False)
+        if titles:
+            ax.set_title(titles[i])
+    plt.show()
+    return axes
+
+# 模型预测
+def predict_ch3(net,test_loader,num=5):
+    for x,y in test_loader:
+        break
+    labels = d2l.get_fashion_mnist_labels(y)
+    preds = d2l.get_fashion_mnist_labels(net(x).argmax(axis=1))
+    titles = [(label + '\\' + pred) for label,pred in zip(labels,preds)]
+    # print(titles[0:num])
+    show_images(x[0:num].reshape((num,28,28)),1,num,titles=titles[0:num],scale=2)
+
+predict_ch3(net,test_loader)

@@ -29,6 +29,9 @@ print(x.shape,y.T.shape)
 z = torch.mm(x,y.T) # 或 z = x@y.T
 print(z)
 
+z1 = torch.matmul(x,y.T)
+print(z1)
+
 
 
 a = torch.arange(4)
