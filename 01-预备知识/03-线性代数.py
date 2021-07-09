@@ -7,6 +7,15 @@
 
 import torch
 
+#1.标量
+x = torch.tensor([3.0])
+y = torch.tensor([2.0])
+
+print(x+y,x*y,x/y,x**y)
+#tensor([5.]) tensor([6.]) tensor([1.5000]) tensor([9.])
+
+
+'''
 a = torch.arange(12).reshape(3,4)
 print(a)
 b = a.T
@@ -57,3 +66,4 @@ u = torch.tensor([3.0, -4.0])
 print("L1:",torch.abs(u).sum())
 print("L2",torch.norm(u))
 print("F:",torch.norm(torch.ones((4,9))))
+'''

@@ -23,8 +23,10 @@ print(x.numel())  #12
 print(x.dtype)  #torch.int64
 print(len(x))  #12
 
+#改变维度
 x = x.reshape(2,2,3)
 print(x.shape)  #torch.Size([2, 2, 3])
+#自动计算维度
 x = x.reshape(-1, 4)
 print(x.shape)  #torch.Size([3, 4])
 
@@ -44,9 +46,9 @@ print(x5)
 #基本运算
 x = torch.tensor([1.0, 2, 4, 8])
 y = torch.tensor([2, 2, 2, 2])
-print(x + y, x - y, x * y, x / y, x**y,x//y)
+print(x + y, x - y, x * y, x / y, x**y, x//y)
 #幂运算
-a = torch.exp(torch.tensor(1))  #
+a = torch.exp(torch.tensor(1))
 print(a)  #tensor(2.7183)
 #对数运算
 b = torch.log(a)
@@ -106,7 +108,7 @@ a = a + b  #重新分配内存
 print(id(a) == before)  #False
 
 before = id(a)
-a[:] = a+b  # 或 a += b  #不重新分配内存
+a += b  # 或 a[:] = a+b #不重新分配内存
 print(id(a) == before)  #True
 
 
