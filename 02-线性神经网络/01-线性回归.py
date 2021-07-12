@@ -6,7 +6,7 @@
 """
 
 import torch
-from toolFunctions import Timer
+from toolFunctions import timer
 
 
 n = 100000
@@ -14,7 +14,7 @@ a = torch.ones(n)
 b = torch.ones(n)
 c = torch.zeros(n)
 
-timer = Timer.Timer()
+timer = timer.Timer()
 timer.start()
 # for循环计算
 for i in range(n):
