@@ -9,25 +9,30 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 
-# 保存和读取单个张量
+#1.保存和读取单个张量
 x = torch.arange(4)
 torch.save(x,'x-file')
 
 x1 = torch.load('x-file')
 print(x1)
+#tensor([0, 1, 2, 3])
 
-# 保存和读取张量列表
+#2.保存和读取张量列表
 y = torch.zeros(4)
 torch.save([x,y],'x-y-file')
 x2,y2 = torch.load('x-y-file')
 print(x2,y2)
+#tensor([0, 1, 2, 3]) tensor([0., 0., 0., 0.])
 
-# 保存和读取从字符串映射到张量的字典
+#3.保存和读取从字符串映射到张量的字典
 mydict = {'x':x, 'y':y}
 torch.save(mydict,'mydict')
 mydict2 = torch.load('mydict')
 print(mydict2)
+#{'x': tensor([0, 1, 2, 3]), 'y': tensor([0., 0., 0., 0.])}
 
+
+#4.加载和保存模型参数
 class MLP(nn.Module):
     def __init__(self):
         super(MLP, self).__init__()
@@ -47,3 +52,7 @@ net2 = MLP()
 net2.load_state_dict(torch.load('mlp.params'))
 y2 = net2(x)
 print(y == y2)
+'''
+tensor([[True, True, True, True, True, True, True, True, True, True],
+        [True, True, True, True, True, True, True, True, True, True]])
+'''

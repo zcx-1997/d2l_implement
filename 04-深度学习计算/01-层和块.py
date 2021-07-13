@@ -5,9 +5,10 @@
     Author  : 春晓
     Software: PyCharm
 """
-from torch.nn import functional as F
+
 import torch
 from torch import nn
+from torch.nn import functional as F
 
 net = nn.Sequential(
     nn.Linear(20,256),
@@ -19,7 +20,7 @@ x = torch.rand(2,20)
 y = net(x)
 print(y)
 
-# 自定义类
+# 自定义块
 class MLP(nn.Module):
 
     def __init__(self):
