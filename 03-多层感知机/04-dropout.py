@@ -1,8 +1,10 @@
-#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
 """
-    Time    : 2021/4/28 20:04
-    Author  : 春晓
-    Software: PyCharm
+@Time : 2021/7/13
+@Author : Lenovo
+@File : 04-dropout
+@Description : dropout + 权重衰减
 """
 
 import torch
@@ -14,15 +16,18 @@ from toolFunctions.fashionMnist import load_data_fashion_mnist, sum_right, accur
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-net = nn.Sequential(
-    nn.Flatten(),
-    nn.Linear(784,256),
-    nn.Linear(256,10)
-)
+#dropout
+net = nn.Sequential(nn.Flatten(),
+                    nn.Linear(784, 256), nn.ReLU(), nn.Dropout(0.5),
+                    nn.Linear(256, 256), nn.ReLU(), nn.Dropout(0.5),
+                    nn.Linear(256, 10)
+                    )
+
 
 def init_weights(m):
     if type(m) == nn.Linear:
-        nn.init.normal_(m.weight,std=0.01)
+        nn.init.normal_(m.weight, std=0.01)
+
 
 net.apply(init_weights)
 
@@ -61,7 +66,6 @@ def train(net, train_loader, test_loader, loss, optimizer, epochs):
         # 模型评估
         net.eval()
 
-        test_loss = 0
         test_acc = 0
         test_num = 0
 
@@ -70,24 +74,20 @@ def train(net, train_loader, test_loader, loss, optimizer, epochs):
             y = y.to(device)
             logits = net(x)
             l = loss(logits, y)
-            test_loss += l.sum()
             test_acc += sum_right(logits, y)
             test_num += len(y)
-        print("test: loss={:.5f}, acc={:.5f}".format(test_loss / test_num, test_acc / test_num))
-        test_acc_list.append(test_acc/test_num)
+        print("test: acc={:.5f}".format(test_acc / test_num))
+        test_acc_list.append(test_acc / test_num)
 
     plt.plot(list(range(epochs)), loss_list)
     plt.plot(list(range(epochs)), acc_list)
     plt.plot(list(range(epochs)), test_acc_list)
     plt.xlabel('epoch')
-    plt.legend(['train loss', 'train acc','test acc'])
+    plt.legend(['train loss', 'train acc', 'test acc'])
     plt.show()
 
 
-
-
 if __name__ == '__main__':
-
     timer = Timer()
 
     batch_size = 256
@@ -106,4 +106,4 @@ if __name__ == '__main__':
     # test(net, test_loader, loss)
 
     print("time:", timer.stop())
-    # time: 115.34698343276978
+    # time: 142.75479984283447
