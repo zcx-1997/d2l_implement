@@ -33,6 +33,7 @@ class Residual(nn.Module):
         y += x
         return self.relu(y)
 
+
 blk = Residual(3, 3)
 x = torch.rand(4, 3, 6, 6)
 y = blk(x)

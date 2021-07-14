@@ -85,8 +85,8 @@ loss = nn.CrossEntropyLoss()
 optimizer = torch.optim.SGD(net.parameters(), lr)
 
 net.to(device)
-timer = Timer()
 
+timer = Timer()
 for epoch in range(epochs):
 
     timer.start()

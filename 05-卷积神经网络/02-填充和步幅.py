@@ -34,8 +34,8 @@ print(y.shape)
 #2.步长
 conv2d = nn.Conv2d(in_channels=1, out_channels=1, kernel_size=3, padding=1, stride=2)
 print(pad_conv2d(conv2d, x).shape)
-# torch.Size([4, 4])  (8-3+1+2)/2 = 4
+# torch.Size([4, 4])  (8-3+1*2+2)/2 = 4
 
 conv2d = nn.Conv2d(in_channels=1, out_channels=1, kernel_size=(3,5), padding=(0,1), stride=(3,4))
 print(pad_conv2d(conv2d, x).shape)
-# torch.Size([2, 2])  (8-3+0+3)/3 = 2, (8-5+1+4)/4 = 2
+# torch.Size([2, 2])  (8-3+0*2+3)/3 = 2, (8-5+1*2+4)/4 = 2

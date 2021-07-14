@@ -8,11 +8,13 @@
 
 import torch
 from torch import nn
-from torch.nn import functional as F
 from torchsummary import summary
-from d2l import torch as d2l
+from toolFunctions.train_gen import train
+from toolFunctions.fashionMnist import load_data_fashion_mnist
+
 
 class Inception(nn.Module):
+    '''c1,c2,c3,c4 是每条路径的输出通道数'''
     def __init__(self,in_channels,c1,c2,c3,c4,**kwargs):
         super(Inception, self).__init__(**kwargs)
 
@@ -33,7 +35,9 @@ class Inception(nn.Module):
         p3 = F.relu(self.p3_2(F.relu(self.p3_1(x))))
         p4 = F.relu(self.p4_2(self.p4_1(x)))
 
+        #在通道维度上连接
         return torch.cat((p1,p2,p3,p4),dim=1)
+
 
 b1 = nn.Sequential(nn.Conv2d(1,64,kernel_size=7,stride=2,padding=3),
                    nn.ReLU(),nn.MaxPool2d(kernel_size=3,padding=1))
@@ -58,3 +62,14 @@ b5 = nn.Sequential(Inception(832,256,(160,320),(32,128),128),
 net = nn.Sequential(b1,b2,b3,b4,b5,nn.Linear(1024,10))
 
 summary(net,(1,96,96))
+
+batch_size = 256
+lr = 0.1
+epochs = 10
+
+device = torch.device('cude' if torch.cuda.is_available() else 'cpu')
+print("training on", device)
+train_loader, test_loader = load_data_fashion_mnist(batch_size, resize=96)
+loss = nn.CrossEntropyLoss()
+optimizer = torch.optim.SGD(net.parameters(), lr)
+train(net, train_loader, test_loader, loss, optimizer, epochs, device)
