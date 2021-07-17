@@ -32,13 +32,13 @@ net = nn.Sequential(
     nin_block(384, 10, kernel_size=3, strides=1, padding=1),
     nn.AdaptiveAvgPool2d((1, 1)), nn.Flatten())
 
-summary(net, (1, 224, 224))
+# summary(net, (1, 224, 224))
 
-batch_size = 256
+batch_size = 16
 lr = 0.1
 epochs = 10
 
-device = torch.device('cude' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print("training on", device)
 train_loader, test_loader = load_data_fashion_mnist(batch_size, resize=224)
 loss = nn.CrossEntropyLoss()

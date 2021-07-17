@@ -42,13 +42,14 @@ def vgg(conv_arch):
 #VGG-11：8+3
 conv_arch = ((1, 64), (1, 128), (2, 256), (2, 512), (2, 512))
 vgg_11 = vgg(conv_arch)
-summary(vgg_11, (1, 224, 224))
+# summary(vgg_11, (1, 224, 224))
 
 batch_size = 256
 lr = 0.1
 epochs = 10
 
-device = torch.device('cude' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+print("training on", device)
 train_loader,test_loader = load_data_fashion_mnist(batch_size,resize=224)
 loss = nn.CrossEntropyLoss()
 optimizer = torch.optim.SGD(vgg_11.parameters(),lr)

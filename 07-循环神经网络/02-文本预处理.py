@@ -7,20 +7,30 @@
 """
 import collections
 import re
-from d2l import torch as d2l
 
+# from d2l import torch as d2l
+#
+# d2l.DATA_HUB['time_machine'] = (d2l.DATA_URL + 'timemachine.txt',
+#                                 '090b5e7e70c295757f55df93cb0a180b9691891a')
 
 # 读取数据集
+# def read_time_machine(): #@save
+#     """Load the time machine dataset into a list of text lines."""
+#     with open(d2l.download('time_machine'), 'r') as f:
+#         lines = f.readlines()
+#     return [re.sub('[^A-Za-z]+', ' ', line).strip().lower() for line in lines]
+
 def read_time_machine():
-    with open('../data/timemechine.txt','r',encoding='UTF-8') as f:
+    with open('../data/timemachine.txt','r',encoding='UTF-8') as f:
         lines = f.readlines()  # 返回一个列表，每行是一个字符串
-        # 对列表中的每个字符串，将非英文字母字符用空格代替，并去掉两端的空白，返回仍是一个列表
+        # 对列表中的每个字符串，将非英文字母字符用空格代替，将大写字母转换成小写并去掉两端的空白，返回仍是一个列表
         re_lines = [re.sub('[^A-Za-z]+',' ', line).strip().lower() for line in lines]
-        return re_lines
+    return re_lines
 
 lines = read_time_machine()
-print('text lines: %d' % len(lines))  #  3557
-print(lines[0:10])
+print('text lines: %d' % len(lines))  #3221
+print(lines[0])  #the time machine by h g wells
+print(lines[10])  #twinkled and his usually pale face was flushed and animated the
 
 # 标记化
 def tokenize(lines, token='word'):
@@ -33,14 +43,25 @@ def tokenize(lines, token='word'):
         print('错误：未知令牌类型：' + token)
 
 tokens = tokenize(lines)  # 二维列表
-# print(len(tokens))  #  3557
-# for i in range(11):
-#     print(tokens[i])
-
+for i in range(11):
+    print(tokens[i])
+'''
+['the', 'time', 'machine', 'by', 'h', 'g', 'wells']
+[]
+[]
+[]
+[]
+['i']
+[]
+[]
+['the', 'time', 'traveller', 'for', 'so', 'it', 'will', 'be', 'convenient', 'to', 'speak', 'of', 'him']
+['was', 'expounding', 'a', 'recondite', 'matter', 'to', 'us', 'his', 'grey', 'eyes', 'shone', 'and']
+['twinkled', 'and', 'his', 'usually', 'pale', 'face', 'was', 'flushed', 'and', 'animated', 'the']
+'''
 
 # 建立词汇表，并进行数字索引
-
 def count_corpus(tokens):
+    '''统计标记的频率'''
     if len(tokens) == 0 or isinstance(tokens[0],list):
         tokens = [token for line in tokens for token in line]  # 将标记列表展平成一个列表
     return collections.Counter(tokens)  # 一个字典，标记：个数
@@ -74,6 +95,7 @@ class Vocab:
     def __getitem__(self, tokens):  # 返回tokens的索引，单个（值）或多个（列表）
         if not isinstance(tokens,(list,tuple)):
             return self.token_to_idx.get(tokens,self.unk)
+
         return [self.__getitem__(token) for token in tokens]
 
     def to_tokens(self,indices):  # 返回indices的token值，单个（值）或多个（列表）
@@ -87,7 +109,14 @@ vocab = Vocab(tokens)
 print('words:', tokens[0])
 print('indices:', vocab[tokens[0]])
 print('tokens:',vocab.to_tokens(vocab[tokens[0]]))
+'''
+words: ['the', 'time', 'machine', 'by', 'h', 'g', 'wells']
+indices: [1, 19, 50, 40, 2183, 2184, 400]
+tokens: ['the', 'time', 'machine', 'by', 'h', 'g', 'wells']
+'''
 
+#整合到一起
+print("===================每个字符映射到一个编码=====================")
 def load_corpus_time_machine(max_tokens=-1):
     """返回时光机器数据集的标记索引列表和词汇表。"""
     lines = read_time_machine()
@@ -101,6 +130,12 @@ def load_corpus_time_machine(max_tokens=-1):
     return corpus, vocab
 
 corpus, vocab = load_corpus_time_machine()
-print(len(corpus), len(vocab))
+print(len(corpus), len(vocab))  #170580 28
 print(corpus[:20])
 print(vocab.to_tokens(corpus[:20]))
+'''
+===================每个字符映射到一个编码=====================
+170580 28
+[3, 9, 2, 1, 3, 5, 13, 2, 1, 13, 4, 15, 9, 5, 6, 2, 1, 21, 19, 1]
+['t', 'h', 'e', ' ', 't', 'i', 'm', 'e', ' ', 'm', 'a', 'c', 'h', 'i', 'n', 'e', ' ', 'b', 'y', ' ']
+'''

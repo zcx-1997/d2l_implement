@@ -8,7 +8,7 @@
 
 import torch
 from torch import nn
-from torchsummary import summary
+from torch.nn import functional as F
 from toolFunctions.train_gen import train
 from toolFunctions.fashionMnist import load_data_fashion_mnist
 
@@ -61,15 +61,15 @@ b5 = nn.Sequential(Inception(832,256,(160,320),(32,128),128),
                    )
 net = nn.Sequential(b1,b2,b3,b4,b5,nn.Linear(1024,10))
 
-summary(net,(1,96,96))
+# summary(net,(1,96,96))
 
-batch_size = 256
+batch_size = 16
 lr = 0.1
 epochs = 10
 
-device = torch.device('cude' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print("training on", device)
 train_loader, test_loader = load_data_fashion_mnist(batch_size, resize=96)
 loss = nn.CrossEntropyLoss()
-optimizer = torch.optim.SGD(net.parameters(), lr)
+optimizer = torch.optim.SGD(net.parameters(), lr,weight_decay=3)
 train(net, train_loader, test_loader, loss, optimizer, epochs, device)

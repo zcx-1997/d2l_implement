@@ -78,7 +78,7 @@ def train(net, train_loader, loss, optimizer, epochs):
             x = x.to(device)
             y = y.to(device)
             logits = net(x)
-            l = loss(logits, y)
+            l = loss(logits, y)  #train_l: torch.Size([])
             optimizer.zero_grad()
             l.backward()
             optimizer.step()
@@ -98,17 +98,15 @@ def test(net, test_loader, loss):
 
     total_loss = 0
     total_acc = 0
-    total_num = 0
-
     for x, y in test_loader:
         x = x.to(device)
         y = y.to(device)
         logits = net(x)
         l = loss(logits, y)
-        total_loss += l.sum()
-        total_acc += sum_right(logits, y)
-        total_num += len(y)
-    print("test: loss={:.5f}, acc={:.5f}".format(total_loss / total_num, total_acc / total_num))
+        # print("test_l:",len(l))
+        total_loss += l
+        total_acc += accuracy(logits, y)
+    print("test: loss={:.5f}, acc={:.5f}".format(total_loss / len(test_loader), total_acc / len(test_loader)))
 
 
 if __name__ == '__main__':

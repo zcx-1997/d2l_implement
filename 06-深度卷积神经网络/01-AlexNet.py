@@ -30,7 +30,7 @@ net = nn.Sequential(
 
 # 观察一下每一层的输出
 # print(net)
-summary(net,(1,224,224))
+# summary(net,(1,224,224))
 
 # net1 = nn.Sequential(
 #     nn.Conv2d(1,32,kernel_size=3,padding=1),nn.ReLU(),
@@ -53,8 +53,10 @@ batch_size = 256
 lr = 0.1
 epochs = 10
 
-device = torch.device('cude' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+print("training on", device)
 train_loader,test_loader = load_data_fashion_mnist(batch_size,resize=224)
 loss = nn.CrossEntropyLoss()
 optimizer = torch.optim.SGD(net.parameters(),lr)
 train(net,train_loader,test_loader,loss,optimizer,epochs,device)
+#time=45.89147
