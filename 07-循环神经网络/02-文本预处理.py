@@ -20,6 +20,7 @@ import re
 #         lines = f.readlines()
 #     return [re.sub('[^A-Za-z]+', ' ', line).strip().lower() for line in lines]
 
+# 1.读取数据集
 def read_time_machine():
     with open('../data/timemachine.txt','r',encoding='UTF-8') as f:
         lines = f.readlines()  # 返回一个列表，每行是一个字符串
@@ -32,7 +33,9 @@ print('text lines: %d' % len(lines))  #3221
 print(lines[0])  #the time machine by h g wells
 print(lines[10])  #twinkled and his usually pale face was flushed and animated the
 
-# 标记化
+
+# 2.tokenize
+print("================== tokenize ====================")
 def tokenize(lines, token='word'):
     """将文本行拆分为单词或字符标记。"""
     if token == 'word':
@@ -59,7 +62,7 @@ for i in range(11):
 ['twinkled', 'and', 'his', 'usually', 'pale', 'face', 'was', 'flushed', 'and', 'animated', 'the']
 '''
 
-# 建立词汇表，并进行数字索引
+# 3.建立词汇表，并进行数字索引
 def count_corpus(tokens):
     '''统计标记的频率'''
     if len(tokens) == 0 or isinstance(tokens[0],list):

@@ -103,15 +103,15 @@ Linear output shape: torch.Size([1, 10])                    fc 1
 '''
 
 
-batch_size = 256
-lr = 0.1
-epochs = 10
+batch_size = 32
+lr = 0.5
+epochs = 100
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print("training on", device)
 train_loader, test_loader = load_data_fashion_mnist(batch_size, resize=96)
 loss = nn.CrossEntropyLoss()
-optimizer = torch.optim.SGD(net.parameters(), lr,weight_decay=3)
+optimizer = torch.optim.SGD(net.parameters(), lr)
 
 resnet_18 = net
 train(resnet_18, train_loader, test_loader, loss, optimizer, epochs, device)

@@ -9,10 +9,10 @@ import torch
 import math
 from torch import nn
 from torch.nn import functional as F
-from d2l import torch as d2l
+from toolFunctions.txt_process import load_data_time_machine
 
 # 1.独热编码
-x = torch.arange(10).reshape(10, 1)  # torch.Size([10, 1])
+# x = torch.arange(10).reshape(10, 1)  # torch.Size([10, 1])
 # print(F.one_hot(x.T, 10).shape)  # torch.Size([1, 10, 10])
 # print(F.one_hot(x.T, 10))
 '''
@@ -90,11 +90,11 @@ class RNN:
         return self.init_state(batch_size, self.num_hiddens, device)
 
 
-device = torch.device('cude' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 batch_size, num_steps = 32, 35
 num_hiddens = 512
 
-train_loader, vocab = d2l.load_data_time_machine(batch_size, num_steps)
+train_loader, vocab = load_data_time_machine(batch_size, num_steps)
 # train_loader:(2,32,35),len(vocab)=28
 
 # 3.检测一下网络输出
@@ -106,7 +106,6 @@ net = RNN(len(vocab), num_hiddens, device, get_params, init_rnn_state, rnn)
 state = net.begin_state(x.shape[0], device)  # 初始化隐藏状态，0
 # print(state[0].shape)  #torch.Size([2, 512]),
 y, new_state = net(x.to(device), state)
-
 print(y.shape)  # torch.Size([10, 28])
 print(new_state[0].shape)  # torch.Size([2, 512])
 
@@ -119,15 +118,30 @@ y = y.T.reshape(-1)  # torch.Size([1120])
 def predict(prefix, num_preds, net, vocab, device):
     """在`prefix`后⾯⽣成新字符。 """
     state = net.begin_state(batch_size=1, device=device)
-    outputs = [vocab[prefix[0]]]
+    outputs = [vocab[prefix[0]]]  # [3]: "t"
     get_input = lambda: torch.tensor([outputs[-1]], device=device).reshape((1, 1))
     for y in prefix[1:]:  # 预热期
         _, state = net(get_input(), state)
         outputs.append(vocab[y])
+        #[3,5,13,2,1,3,10,4,22,2,12,12,2,10,1]: "time traveller "
     for _ in range(num_preds):  # 预测`num_preds`步
         y, state = net(get_input(), state)
         outputs.append(int(y.argmax(dim=1).reshape(1)))
     return ''.join([vocab.idx_to_token[i] for i in outputs])
+
+pred = predict("time traveller ",10,net,vocab,device)
+print(pred)  #time traveller xpkcaiwcgt
+
+
+def grad_clippling(net,theta):
+    if isinstance(net,nn.Module):
+        params = [p for p in net.parameters() if p.requires_grad]
+    else:
+        params = net.params
+    norm = torch.sqrt(sum(torch.sum((p.grad**2)) for p in params))
+    if norm > theta:
+        for param in params:
+            param.grad[:] *= theta / norm
 
 
 # 5.模型训练
@@ -154,6 +168,7 @@ def train_epoch(net, train_data, loss, optimizer, device, use_random_iter):
         if isinstance(optimizer, torch.optim.Optimizer):
             optimizer.zero_grad()
             l.backword()
+            grad_clippling(net, 1)
             optimizer.step()
         else:
             l.backward()
@@ -162,28 +177,32 @@ def train_epoch(net, train_data, loss, optimizer, device, use_random_iter):
         num_tokes += y.numel()
     return math.exp(total_loss / num_tokes)
 
+def sgd(params, lr, batch_size):
+    '''小批量随机梯度下降'''
+    with torch.no_grad():  # 不构建计算图，操作不会被track
+        for param in params:
+            param -= lr * param.grad / batch_size  # 计算的损失是一个批量样本的总和,进行一下平均
+            param.grad.zero_()
 
 def train_epochs(net, train_data, vocab, lr, epochs, device, use_random_iter=False):
-
     loss = nn.CrossEntropyLoss()
-
     if isinstance(net, nn.Module):
         optimizer = torch.optim.SGD(net.parameters(),lr)
-
     else:
-        optimizer = lambda batch_size: d2l.sgd(net.params,lr,batch_size)
+        optimizer = lambda batch_size: sgd(net.params,lr,batch_size)
     predict1 = lambda prefix: predict(prefix, 50, net, vocab, device)
     for epoch in range(epochs):
         ppl = train_epoch(net, train_data, loss, optimizer, device, use_random_iter)
 
         if (epoch + 1) % 1 == 0:
-            print(predict1("time traveller"))
-
+            print(predict1("time traveller "))
     print("困惑度：{}".format(ppl))
-    print(predict1("time traveller"))
-    print(predict1("traveller"))
+    print(predict1("time traveller "))
+    print(predict1("traveller "))
 
 
-epochs = 500
+epochs = 1000
 lr = 1
+print("==============================================")
+print("training on: ",device)
 train_epochs(net, train_loader, vocab, lr, epochs, device)
